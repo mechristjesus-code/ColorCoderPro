@@ -1,23 +1,33 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Playfair_Display } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { AgentationGuard } from "@/components/AgentationGuard";
 import { HappySeedsWatermark } from "@/components/HappySeedsWatermark";
+import { NavBar } from "@/components/NavBar";
 import "./globals.css";
-import jsonMetadata from "../metadata.json";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const playfair = Playfair_Display({
+  variable: "--font-playfair",
   subsets: ["latin"],
+  display: "swap",
 });
 
-export const metadata: Metadata = jsonMetadata;
+export const metadata: Metadata = {
+  title: "The 144,000 Color Project",
+  description: "A living color intelligence platform — 1.87 million color variants with permanent identities, discovering emotional meaning through human interaction and AI.",
+  keywords: ["color", "144000", "color intelligence", "color psychology", "color system"],
+  icons: {
+    icon: "/favicon-32.png",
+    apple: "/logo-180.png",
+  },
+};
 
 export default function RootLayout({
   children,
@@ -25,7 +35,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <head>
         {process.env.NODE_ENV === "production" && (
           <Script
@@ -35,10 +45,11 @@ export default function RootLayout({
           />
         )}
       </head>
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+      <body className={`${inter.variable} ${playfair.variable} antialiased`}>
+        <NavBar />
+        <main className="relative z-10 pt-16">
+          {children}
+        </main>
         <HappySeedsWatermark />
         <AgentationGuard />
         {process.env.NODE_ENV === "production" && <Analytics />}
