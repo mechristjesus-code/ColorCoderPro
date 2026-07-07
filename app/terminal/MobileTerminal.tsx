@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { Send, RotateCcw, Copy, Check, Menu, X, Eye, EyeOff, Wifi, WifiOff } from "lucide-react";
+import { useState, useEffect, useRef, useCallback } from "react";
+import { Send, RotateCcw, Copy, Check, Menu, X, Eye, EyeOff, Wifi, WifiOff, Download } from "lucide-react";
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -143,6 +143,92 @@ function AuthScreen({ onAuth }: { onAuth: (pw: string) => void }) {
           set ADMIN_PASSWORD in .env to change
         </div>
       </div>
+    </div>
+  );
+}
+
+// ── Install Prompt Banner ────────────────────────────────────────────────────
+
+// Shows "Add to Home Screen" bar when the browser fires beforeinstallprompt.
+// On iOS Safari (which doesn't fire the event), shows a manual instruction instead.
+
+interface BeforeInstallPromptEvent extends Event {
+  prompt: () => Promise<void>;
+  userChoice: Promise<{ outcome: "accepted" | "dismissed" }>;
+}
+
+function InstallBanner() {
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [showIos, setShowIos]               = useState(false);
+  const [dismissed, setDismissed]           = useState(false);
+
+  useEffect(() => {
+    // Already installed?
+    if (window.matchMedia("(display-mode: standalone)").matches) return;
+    if ((navigator as Navigator & { standalone?: boolean }).standalone) return;
+
+    // Android Chrome / Edge — native prompt
+    const handler = (e: Event) => {
+      e.preventDefault();
+      setDeferredPrompt(e as BeforeInstallPromptEvent);
+    };
+    window.addEventListener("beforeinstallprompt", handler);
+
+    // iOS Safari — no event, show manual tip
+    const isIos = /iphone|ipad|ipod/i.test(navigator.userAgent);
+    const isSafari = /safari/i.test(navigator.userAgent) && !/chrome/i.test(navigator.userAgent);
+    if (isIos && isSafari) setShowIos(true);
+
+    return () => window.removeEventListener("beforeinstallprompt", handler);
+  }, []);
+
+  const handleInstall = useCallback(async () => {
+    if (!deferredPrompt) return;
+    await deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === "accepted") setDismissed(true);
+    setDeferredPrompt(null);
+  }, [deferredPrompt]);
+
+  if (dismissed || (!deferredPrompt && !showIos)) return null;
+
+  return (
+    <div style={{
+      background: "linear-gradient(135deg, rgba(201,168,76,0.15), rgba(201,168,76,0.08))",
+      borderBottom: "1px solid rgba(201,168,76,0.25)",
+      padding: "8px 14px",
+      display: "flex",
+      alignItems: "center",
+      gap: 10,
+      flexShrink: 0,
+    }}>
+      <Download size={14} color="#C9A84C" style={{ flexShrink: 0 }} />
+      {showIos ? (
+        <span style={{ fontSize: 12, color: "#F0EDE8", flex: 1, lineHeight: 1.4 }}>
+          Add to Home Screen: tap <strong style={{ color: "#C9A84C" }}>Share ↑</strong> then{" "}
+          <strong style={{ color: "#C9A84C" }}>Add to Home Screen</strong>
+        </span>
+      ) : (
+        <span style={{ fontSize: 12, color: "#F0EDE8", flex: 1 }}>
+          Install ColorTerm on your home screen
+        </span>
+      )}
+      {deferredPrompt && (
+        <button onClick={handleInstall} style={{
+          padding: "5px 12px", borderRadius: 6,
+          background: "linear-gradient(135deg, #C9A84C, #E8C96A)",
+          border: "none", color: "#040408", fontSize: 12, fontWeight: 700,
+          cursor: "pointer", fontFamily: "monospace", flexShrink: 0,
+        }}>
+          Install
+        </button>
+      )}
+      <button onClick={() => setDismissed(true)} style={{
+        background: "none", border: "none", cursor: "pointer",
+        color: "rgba(240,237,232,0.4)", padding: 2, flexShrink: 0,
+      }}>
+        <X size={14} />
+      </button>
     </div>
   );
 }
@@ -297,6 +383,9 @@ function Terminal({ password }: { password: string }) {
 
   return (
     <div style={{ height: "100dvh", display: "flex", flexDirection: "column", background: BG, fontFamily: "monospace", overflow: "hidden" }}>
+
+      {/* PWA Install Banner */}
+      <InstallBanner />
 
       {/* Top bar */}
       <div style={{ display: "flex", alignItems: "center", gap: 10, padding: "8px 14px", borderBottom: "1px solid rgba(255,255,255,0.07)", flexShrink: 0, background: "rgba(5,5,8,0.95)" }}>

@@ -1,0 +1,54 @@
+{
+  "name": "144K Color Terminal",
+  "short_name": "ColorTerm",
+  "description": "Remote admin terminal for the 144,000 Color Project",
+  "start_url": "/terminal",
+  "scope": "/terminal",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#040408",
+  "theme_color": "#040408",
+  "categories": ["developer", "utilities"],
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-192-maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Terminal",
+      "short_name": "Term",
+      "description": "Open the admin terminal",
+      "url": "/terminal",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Admin Panel",
+      "short_name": "Admin",
+      "description": "Open the full admin panel",
+      "url": "/admin",
+      "icons": [{ "src": "/icon-192.png", "sizes": "192x192" }]
+    }
+  ]
+}
