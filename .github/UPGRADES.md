@@ -17,8 +17,40 @@
 
 ---
 
+## 🌐 Color Community — Expression & Sharing Platform
+**Status:** ✅ BUILT — July 2026
+**Scope:** Large (2 DB tables, 4 API routes, 4 new pages)
+
+Full community sharing layer built around color and emotion. Three post types:
+
+- **Text posts** — written emotional expressions tied to a color and emotion tags
+- **Photo posts** — image URL shared with color + emotion context
+- **Video posts** — YouTube/Vimeo links embedded in feed with reflection text
+
+Three visibility modes: **Public** (name shown), **Anonymous** (shows as "A Blue Soul"),
+**Members** (visible only to survey completers via session ID).
+
+Four reaction types: 🌊 Resonates · 💫 Moving · ⚡ Powerful · 🕊️ Peaceful (toggle on/off).
+
+**Pages built:**
+- `/community` — paginated feed with filters by type, emotion, color group
+- `/community/new` — 4-step creation wizard (type → color → emotions → write/share)
+- `/community/[id]` — full post view with reactions
+
+**DB tables:** `posts`, `post_reactions` (with cascade delete)
+**API routes:** `GET/POST /api/posts`, `GET/POST /api/posts/[id]`
+**Lib:** `lib/posts.ts` — shared constants, emotion colors, YouTube/Vimeo parsers
+
+**Next phase for this feature:**
+- Native video upload (replace link-embed with actual hosting)
+- Comments system
+- Image upload (replace URL with file upload)
+- User accounts for persistent identity across sessions
+
+---
+
 ## 🔗 Color Relationship Engine
-**Status:** 🟢 Ready to build — IN PROGRESS
+**Status:** ✅ BUILT — July 2026
 **Scope:** Medium (1 new lib file + 1 new page + explorer integration)
 
 The core mathematical relationships between colors, computed from any color ID.

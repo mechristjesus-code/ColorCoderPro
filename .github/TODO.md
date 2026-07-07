@@ -79,6 +79,24 @@
 - [ ] Survey completion rate tracking
 - [ ] Email opt-in for "your community results" notification
 
+### Phase 6 — Community Expression & Sharing ✅ BUILT
+- [x] `posts` DB table — text/photo/video, visibility, color + emotion tags
+- [x] `post_reactions` DB table — 4 reaction types, cascade delete
+- [x] `lib/posts.ts` — shared constants, emotion colors, YouTube/Vimeo parsers
+- [x] `GET /api/posts` — paginated feed with type/group/emotion filters
+- [x] `POST /api/posts` — create post with auto media type detection
+- [x] `GET /api/posts/[id]` — single post + reaction counts
+- [x] `POST /api/posts/[id]` — add/toggle reaction (one per session)
+- [x] `/community` feed page — filter by type, emotion; PostCard with reactions
+- [x] `/community/new` — 4-step creation wizard (type→color→emotions→write)
+- [x] `/community/[id]` — full post view with embedded video, reactions
+- [x] Three visibility modes: Public / Anonymous ("A Blue Soul") / Members
+- [ ] 🔥 Image file upload (replace URL input with actual upload)
+- [ ] 🔥 Native video hosting (replace YouTube/Vimeo links)
+- [ ] Comments system on posts
+- [ ] Featured / pinned posts
+- [ ] Reported/flagged content moderation
+
 ### Phase 7 — Emotions
 - [x] Phase 7 questions: calm, energy, joy, fear
 - [ ] 🔥 Emotional heatmap — which colors get which emotions most

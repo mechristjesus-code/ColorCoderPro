@@ -241,4 +241,71 @@ Pushed to live database via `drizzle-kit push`.
 
 ---
 
+---
+
+## Session 2 — Community Expression Platform
+
+### `lib/posts.ts` — Shared Posts Library
+Constants and helpers for the entire community system:
+- `POST_TYPES`, `VISIBILITY_OPTIONS`, `REACTION_TYPES`, `EMOTION_TAGS` — typed const arrays
+- `REACTION_LABELS` — `{ label, emoji }` per reaction type
+- `EMOTION_COLORS` — hex color per emotion tag (used for pill chips in UI)
+- `extractYouTubeId(url)` — regex parser for any YouTube URL format
+- `extractVimeoId(url)` — regex parser for Vimeo URLs
+- `detectMediaType(url)` — returns `'youtube' | 'vimeo' | 'image' | null`
+- `getYouTubeThumbnail(videoId)` — returns `img.youtube.com` hqdefault URL
+- `getAuthorLabel(name, visibility, groupName)` — respects visibility setting
+
+### `db/schemas/posts.ts` — Two New Tables
+
+**`posts`:** id (UUID PK), session_id, display_name, post_type, visibility,
+color_group_id, color_hex, emotion_tags (JSONB array), title, content,
+media_url, media_type, thumbnail_url, likes_count, created_at
+
+**`post_reactions`:** id, post_id (FK→posts, CASCADE DELETE), session_id,
+reaction type, created_at. One reaction per session per post — togglable.
+
+### API Routes
+
+**`GET /api/posts`** — paginated feed. Filters: `type`, `group`, `emotion` (JSONB contains),
+`limit` (max 50), `offset`. Returns `{ count, posts[] }` ordered by created_at DESC.
+
+**`POST /api/posts`** — create post. Auto-detects `mediaType` from URL. Auto-fetches
+YouTube thumbnail. Returns `{ success, post }`.
+
+**`GET /api/posts/[id]`** — single post + reaction counts grouped by type.
+
+**`POST /api/posts/[id]`** — add/toggle reaction. Same session + same reaction = remove.
+Same session + different reaction = update. New session = insert.
+
+### Pages
+
+**`/community`** (CommunityFeed.tsx) — paginated feed of PostCard components.
+Filter tabs (All/Text/Photo/Video), emotion dropdown. "+ New Post" CTA.
+PostCard renders: color swatch with glow, type/visibility icons, emotion chips,
+Playfair title, 3-line content clamp, photo image or video thumbnail, 4 reaction
+buttons with optimistic updates, "View post" link. Empty state with encouragement.
+
+**`/community/new`** (CreatePostClient.tsx) — 4-step wizard:
+1. Type selection (Text/Photo/Video cards)
+2. Color picker (13 group swatches + custom hex input)
+3. Emotion tags multi-select (16 options, colored pills, max 5)
+4. Write + visibility + media URL + YouTube live preview
+
+**`/community/[id]`** — full post view. Large swatch, all metadata badges,
+full content, embedded YouTube/Vimeo iframe (16:9) or full photo, reaction grid
+with counts, author + timestamp, back navigation.
+
+### Visibility System
+- **Public** — name visible, shown to everyone
+- **Anonymous** — shown as "A [GroupName] Soul" (e.g. "A Violet Soul")
+- **Members** — visible only to those with a `colorSessionId` in localStorage
+
+### Session Identity
+All community activity uses `localStorage.getItem("colorSessionId")` — a UUID
+generated once per browser and persisted. No login required. The same ID ties
+survey responses, profiles, posts, and reactions together anonymously.
+
+---
+
 *Built July 2026 — The 144,000 Color Project*
