@@ -17,6 +17,30 @@
 
 ---
 
+## 📱 External Terminal — Mobile + Termux Access
+**Status:** ✅ BUILT — July 2026
+**Scope:** Medium (2 new API routes, 1 standalone page)
+
+Three-layer external terminal access system:
+
+**`/terminal`** — Standalone full-screen mobile terminal (no navbar, fixed viewport).
+Works on any phone browser. Touch-optimized with quick-tap command bar, hamburger menu,
+and proper mobile keyboard settings.
+
+**`POST /api/admin/stream`** — Streaming exec using Node `spawn()`. Returns ndjson.
+Each line is a JSON event (`stdout`/`stderr`/`exit`). Use with `curl -N` for real-time output:
+```bash
+curl -N -X POST /api/admin/stream \
+  -H "x-admin-password: ColorAdmin144" \
+  -d '{"command":"pnpm dev"}'
+```
+
+**`POST /api/admin/shell`** — Stateful session API. Create a session, run commands,
+change directories — all stateful across requests. Sessions expire after 30 min.
+Full Termux scripting support. Session history tracked per session (last 200 commands).
+
+---
+
 ## 🖥️ Admin Terminal & Control Panel
 **Status:** ✅ BUILT — July 2026
 **Scope:** Large (5 API routes, 1 auth lib, 6-panel UI)

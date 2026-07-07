@@ -171,6 +171,23 @@
 
 ---
 
+## 📱 EXTERNAL TERMINAL ✅ BUILT
+
+- [x] `/terminal` — standalone mobile-first full-screen terminal page
+- [x] `app/terminal/layout.tsx` — no navbar, fixed viewport, mobile meta
+- [x] `app/terminal/MobileTerminal.tsx` — auth gate + full terminal UI
+- [x] Quick-tap command bar for mobile (status, tsc, push, logs, server, ls)
+- [x] Hamburger menu with quick commands
+- [x] Session-based execution via `/api/admin/shell`
+- [x] Streaming fallback via `/api/admin/stream` for long commands
+- [x] `POST /api/admin/stream` — real-time streaming exec (ndjson, curl -N)
+- [x] `POST /api/admin/shell` — stateful session API (create/exec/cd/destroy)
+- [x] `GET /api/admin/shell?sessionId=` — inspect session + history
+- [ ] 🔥 PWA manifest — add to home screen on iPhone/Android
+- [ ] Swipe up to scroll history on mobile
+- [ ] Persistent session across page reloads (re-attach by sessionId)
+- [ ] SSH key auth option (alternative to password)
+
 ## 🖥️ ADMIN TERMINAL ✅ BUILT
 
 - [x] `lib/adminAuth.ts` — shared auth middleware (Bearer / x-admin-password header)

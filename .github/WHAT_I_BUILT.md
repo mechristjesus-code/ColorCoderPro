@@ -380,4 +380,77 @@ Refresh button. Live line count display.
 
 ---
 
+---
+
+## Session 4 — External Terminal Access (Mobile + Termux)
+
+### `app/terminal/` — Standalone Mobile Terminal
+
+A completely separate full-screen terminal page at `/terminal` with its own layout
+(no navbar, no padding, fixed viewport). Designed for phone browsers.
+
+**`MobileTerminal.tsx`:**
+- Auth screen with banner art, password input, localStorage persistence
+- Full interactive terminal: output area, quick-tap command bar, input row
+- Session-based: creates a `/api/admin/shell` session on load, runs commands through it
+- Falls back to `/api/admin/exec` if session fails
+- Long-running commands route through `/api/admin/stream` (streaming)
+- Command aliases: `tsc` → `npx tsc --noEmit`, `db:push`, `ps` → port check
+- History navigation with ↑↓ arrow keys (100 command history)
+- `clear`, `help`, `exit` handled locally
+- Slide-down quick menu (hamburger) with 6 common commands
+- Quick-tap button row above the keyboard for mobile use
+- `autoCapitalize="none"` `autoCorrect="off"` `spellCheck={false}` — essential for mobile shell
+
+**`layout.tsx`:**
+- Overrides root layout — no navbar, `position: fixed; inset: 0`
+- `user-scalable=no` in viewport meta — prevents pinch-zoom breaking the layout
+
+### `app/api/admin/stream/route.ts` — Streaming Exec
+
+Uses Node.js `spawn()` instead of `exec()` to stream output in real time.
+Returns a `ReadableStream` with `Content-Type: application/x-ndjson`.
+Each line is one JSON event:
+```
+{"type":"stdout","data":"output text\n","ts":1234567890}
+{"type":"stderr","data":"error text\n","ts":1234567890}
+{"type":"exit","code":0,"duration":342,"ts":1234567890}
+```
+
+**curl/Termux usage:**
+```bash
+curl -N -s -X POST https://your-app.com/api/admin/stream \
+  -H "x-admin-password: ColorAdmin144" \
+  -H "Content-Type: application/json" \
+  -d '{"command":"git log --oneline -5"}'
+```
+
+### `app/api/admin/shell/route.ts` — Stateful Session API
+
+Maintains named sessions in memory (reset on server restart by design).
+Session TTL: 30 minutes of inactivity. Up to unlimited concurrent sessions.
+
+**Actions:**
+- `create` → returns `sessionId + cwd + expires`
+- `exec` → run command in session's current directory
+- `cd` → change session's working directory
+- `destroy` → clean up session
+- `GET ?sessionId=` → inspect session state + last 20 commands
+
+**Termux scripting example:**
+```bash
+# One-liner to run a command from Termux
+SID=$(curl -s -X POST https://your-app.com/api/admin/shell \
+  -H "x-admin-password: ColorAdmin144" \
+  -H "Content-Type: application/json" \
+  -d '{"action":"create"}' | python3 -c "import sys,json; print(json.load(sys.stdin)['sessionId'])")
+
+curl -s -X POST https://your-app.com/api/admin/shell \
+  -H "x-admin-password: ColorAdmin144" \
+  -H "Content-Type: application/json" \
+  -d "{\"action\":\"exec\",\"sessionId\":\"$SID\",\"command\":\"git status\"}"
+```
+
+---
+
 *Built July 2026 — The 144,000 Color Project*
