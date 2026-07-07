@@ -308,4 +308,76 @@ survey responses, profiles, posts, and reactions together anonymously.
 
 ---
 
+---
+
+## Session 3 — Admin Terminal & Control Panel
+
+### `lib/adminAuth.ts` — Auth Helper
+Shared middleware used by every `/api/admin/*` route. Checks `x-admin-password` header
+or `Authorization: Bearer <token>` against `ADMIN_PASSWORD` env var. Returns a
+`401 NextResponse` if invalid, `null` if auth passes. Default password: `ColorAdmin144`.
+
+### API Routes — 5 Admin Endpoints
+
+**`POST /api/admin/exec`** — run any shell command. Body: `{ command, cwd? }`. Returns
+`{ stdout, stderr, exitCode, duration, command, cwd }`. Blocks fork-bombs and
+`rm -rf /` style destructive commands. 30-second timeout. Full env passthrough.
+
+**`GET/POST /api/admin/files`** — file browser and editor. GET with `?path=` lists
+directories or reads file content (max 512KB). POST with `{ path, content }` writes
+a file (creates parent dirs). Path-escape prevention (`path.resolve` + ROOT check).
+
+**`POST /api/admin/db`** — raw SQL query runner. Read-only by default — blocks INSERT/
+UPDATE/DELETE/DROP/TRUNCATE unless `force: true` passed. Returns rows, rowCount,
+duration. Uses a fresh `postgres()` connection per request (closed after query).
+
+**`GET/POST /api/admin/git`** — GET returns `{ branch, status, log }`. POST runs
+one of 8 git operations: status, diff, log, add, commit (with message arg), push,
+pull, stash. All run in project root.
+
+**`GET /api/admin/logs`** — reads dev server logs via `tail -n N`. Params: `file`
+(stderr/stdout), `lines` (max 500). Handles missing log files gracefully.
+
+### Admin UI — `app/admin/AdminClient.tsx` (6 panels)
+
+**Auth Gate:** Password input with show/hide toggle. Stores token in `localStorage`
+key `colorAdminToken`. Auto-verifies on page load if token exists. Shows default
+password hint.
+
+**Terminal Panel:** Full interactive shell. Monospace output with ANSI colors stripped.
+Command history with ↑↓ arrow navigation (last 100 commands). `cd` handled locally
+(updates displayed CWD). `clear` wipes output. Exit code + duration shown per command.
+Copy button per command. Looks like a real terminal.
+
+**Quick Actions Panel:** 16 one-click command buttons across two columns. Results
+stream into the right column with pass/fail color coding. Covers: tsc check, git
+status/diff/add/push/pull, drizzle push, port check, log errors, disk/memory,
+survey/post counts, node version.
+
+**Git Panel:** Live branch + working tree status. One-click buttons for status/diff/
+add/push/pull. Commit message input + Commit button. Recent commit log. Operation
+results panel.
+
+**File Browser Panel:** Breadcrumb navigation. Directory grid with folder/file icons
+and sizes. Click to drill in. File viewer with syntax-highlighted monospace display.
+Toggle to edit mode → textarea → Save button → writes back via files API.
+
+**DB Panel:** 6 preset query buttons (tables, survey stats, post stats, recent posts,
+reactions, DB size). SQL textarea. Run Query button. Force-write checkbox. Results
+rendered as a scrollable table with sticky headers.
+
+**Logs Panel:** Stderr/stdout toggle. Line count selector (50/100/200/500). Filter
+input for searching. Auto-color: errors = red, warnings = yellow, normal = light gray.
+Refresh button. Live line count display.
+
+### Security Design
+- Password auth on every API route (checked first, before any logic)
+- File browser is sandboxed to `/home/ubuntu/workspace/project` — path escape blocked
+- DB panel is read-only by default — write ops require explicit `force: true`
+- Blocked command list for exec endpoint
+- Credentials stored only in `localStorage` (cleared on browser data wipe)
+- Admin password NOT committed to git (lives in `.env` only)
+
+---
+
 *Built July 2026 — The 144,000 Color Project*

@@ -171,6 +171,30 @@
 
 ---
 
+## 🖥️ ADMIN TERMINAL ✅ BUILT
+
+- [x] `lib/adminAuth.ts` — shared auth middleware (Bearer / x-admin-password header)
+- [x] `ADMIN_PASSWORD` env var — default `ColorAdmin144`, change in `.env`
+- [x] `POST /api/admin/exec` — shell command execution (sandboxed, timeout 30s)
+- [x] `GET/POST /api/admin/files` — file browser + editor (path-sandboxed to project root)
+- [x] `POST /api/admin/db` — SQL query runner (read-only by default)
+- [x] `GET/POST /api/admin/git` — git status + operations (add/commit/push/pull)
+- [x] `GET /api/admin/logs` — dev server log viewer (stderr/stdout)
+- [x] Terminal panel — interactive shell with history, cd, clear
+- [x] Quick Actions panel — 16 one-click command buttons
+- [x] Git panel — live status, commit form, recent log
+- [x] Files panel — browser + editor with save
+- [x] DB panel — query runner with preset queries + table results
+- [x] Logs panel — filterable, color-coded, refresh
+- [ ] 🔥 Change password UI (currently requires .env edit)
+- [ ] Session timeout / auto-logout after N minutes
+- [ ] Audit log — record every command run + who ran it + result
+- [ ] Multi-admin support (role-based: read-only vs. write)
+- [ ] WebSocket terminal (real-time streaming output for long commands)
+- [ ] Command output download as .txt
+
+---
+
 ## 🛠️ TECHNICAL DEBT & IMPROVEMENTS
 
 ### Explorer

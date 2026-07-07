@@ -17,6 +17,34 @@
 
 ---
 
+## 🖥️ Admin Terminal & Control Panel
+**Status:** ✅ BUILT — July 2026
+**Scope:** Large (5 API routes, 1 auth lib, 6-panel UI)
+
+Full web-based admin control panel at `/admin`. Password-protected via `ADMIN_PASSWORD` env var.
+
+**Six panels:**
+- **Terminal** — interactive shell, command history (↑↓), `cd` support, exit code + duration per command
+- **Quick Actions** — 16 one-click buttons (tsc, git, deploy, DB counts, log errors, port check)
+- **Git** — live status, one-click add/commit/push/pull, commit message input, recent log
+- **Files** — full file browser with drill-down, view + edit + save any file in the project
+- **Database** — SQL query runner, read-only by default, preset queries, scrollable table results
+- **Logs** — dev server stderr/stdout viewer, filter, line count, auto-color by severity
+
+**AI access:** Every panel's functionality is also available via direct API calls:
+```
+POST /api/admin/exec     { command, cwd? }          → { stdout, stderr, exitCode }
+GET  /api/admin/files?path=   → directory listing / file content
+POST /api/admin/files    { path, content }           → write file
+POST /api/admin/db       { sql, force? }             → query results
+GET  /api/admin/git                                  → branch + status + log
+POST /api/admin/git      { op, args? }               → git operation
+GET  /api/admin/logs?file=stderr&lines=100           → log lines
+```
+All routes require `x-admin-password` or `Authorization: Bearer <token>` header.
+
+---
+
 ## 🌐 Color Community — Expression & Sharing Platform
 **Status:** ✅ BUILT — July 2026
 **Scope:** Large (2 DB tables, 4 API routes, 4 new pages)
